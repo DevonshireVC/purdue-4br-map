@@ -46,11 +46,59 @@ details.lot .warn{background:#ffe3e3;border:1px solid #d33;border-radius:4px;pad
  #map{height:62%}
  .leaflet-popup-content{max-height:45vh;width:78vw!important}
 }
+/* favorites / notes / group sharing (included by build.py) */
+#favbar{padding:8px 12px;border-bottom:1px solid #ddd;background:#fff;font-size:13px}
+#favbar .row{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin:4px 0}
+#favbar label.nm{font-weight:600;font-size:12px}
+#myname{flex:1;min-width:120px;font-size:16px;padding:6px 8px;border:1px solid #bbb;border-radius:6px}
+#favbar .help{font-size:12px;color:#555;margin:4px 0}
+.fbtn{font-size:14px;padding:9px 12px;min-height:40px;border-radius:6px;border:1px solid #1f2a44;background:#1f2a44;color:#fff;cursor:pointer}
+.fbtn.sec{background:#fff;color:#1f2a44}
+#sharebox{display:none;margin-top:4px}
+#sharebox input{width:100%;font-size:13px;padding:6px;border:1px solid #bbb;border-radius:6px}
+#sharemsg{color:#0a5;font-weight:600;font-size:12.5px}
+#grouplist{font-size:12.5px;margin-top:4px}
+#grouplist .gp{display:inline-flex;align-items:center;gap:2px;background:#f1eefb;border:1px solid #cfc6ee;border-radius:14px;padding:2px 4px 2px 9px;margin:2px 4px 2px 0}
+#grouplist .gp.me{padding-right:9px;background:#fff0f3;border-color:#f3b6c3}
+#grouplist .rm{border:none;background:none;font-size:18px;line-height:18px;min-width:32px;min-height:32px;cursor:pointer;color:#933}
+#favbar select{font-size:14px;padding:6px;min-height:38px;border-radius:6px}
+#favbar .chk{display:inline-flex;align-items:center;gap:6px;min-height:38px;cursor:pointer}
+#favbar .chk input{width:20px;height:20px}
+.item{display:flex;gap:6px;align-items:flex-start}
+.item .ib{flex:1;min-width:0}
+.hbtn{border:none;background:none;cursor:pointer;font-size:24px;line-height:24px;min-width:44px;min-height:44px;color:#c2185b;padding:0;flex:none}
+.item .fx{font-size:12px;color:#7a2350;margin-top:2px}
+.item .fx .gc{background:#fde4ec;border-radius:10px;padding:1px 7px;margin-right:6px;font-weight:600}
+.item.dim{opacity:.55}
+.favblk{border:1px solid #f0b8c8;background:#fff6f8;border-radius:6px;padding:6px 8px;margin:6px 0}
+.favblk .hbig{font-size:15px;padding:8px 12px;min-height:42px;border-radius:20px;border:1px solid #c2185b;background:#fff;color:#c2185b;cursor:pointer;font-weight:600}
+.favblk .hbig.on{background:#c2185b;color:#fff}
+.favblk textarea{width:100%;min-height:70px;font-size:16px;font-family:inherit;padding:6px;border:1px solid #d9a3b3;border-radius:6px;margin-top:6px;resize:vertical}
+.favblk .cnt{font-size:11px;color:#777;text-align:right}
+.favblk .grp{margin-top:6px;font-size:12.5px}
+.favblk .grp b{display:block;margin-bottom:2px}
+.favblk .gr{padding:3px 0;border-top:1px dashed #efc9d4}
+.favblk .gr .nt{white-space:pre-wrap;color:#444;overflow-wrap:anywhere}
+.favbadge{background:#c2185b;color:#fff;border:2px solid #fff;border-radius:10px;font-size:11px;font-weight:700;line-height:14px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.4);white-space:nowrap}
+.favbadge.fr{background:#8e6fd1}
+.umark.favring{box-shadow:0 0 0 3px #ffc400,0 0 0 5px #c2185b}
+#banner{position:fixed;top:10px;left:50%;transform:translateX(-50%);z-index:3000;background:#1f2a44;color:#fff;padding:10px 16px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.35);font-size:14px;display:none;max-width:90vw}
+
 </style></head><body>
+<div id="banner" role="status" aria-live="polite"></div>
 <div id="app">
  <div id="side">
   <header><h1>Purdue 3–4 person apartments, 2027–28</h1>
    <p>Researched Sep 27, 2026. Prices change; confirm with the property. Not contacted or applied.</p></header>
+  <div id="favbar">
+   <div class="row"><label class="nm" for="myname">Your name</label><input id="myname" type="text" placeholder="e.g. Sam" autocomplete="given-name"></div>
+   <div class="help">Tap ♡ to favorite, add notes, then Share my picks and paste the link in your group chat. Notes are saved on this device.</div>
+   <div class="row"><button id="sharebtn" class="fbtn" type="button">🔗 Share my picks</button><span id="sharemsg" role="status" aria-live="polite"></span></div>
+   <div id="sharebox"><input id="sharelink" type="text" readonly aria-label="Your share link"><div class="row"><button id="copybtn" class="fbtn sec" type="button">Copy link</button></div></div>
+   <div id="grouplist"></div>
+   <div class="row"><label class="chk"><input id="favonly" type="checkbox"> Show favorites only</label>
+    <select id="sortby" aria-label="Sort"><option value="price">Sort: lowest price</option><option value="group">Sort: group favorites (most ♥)</option></select></div>
+  </div>
   <div class="legend-row"><span><span class="dot" style="background:#2e9d4f"></span>Budget (&lt;$1,000/person)</span><span><span class="dot" style="background:#e69500"></span>Mid</span><span><span class="dot" style="background:#c0392b"></span>Premium ($1,400+)</span><span><span class="dot" style="background:#888"></span>Price unknown</span><span><span class="usq" style="background:#e69500"></span>University-owned/run (Purdue Housing), square pin</span><span><b style="background:#000;color:#ffd200;padding:0 4px;border-radius:3px">PMU</b> Purdue Memorial Union</span></div><details class="lot" open><summary>🎓 Purdue apartment lottery (2027–28): key steps &amp; dates</summary><div class="b">
 <div class="warn"><b>Opt-in window opens tomorrow:</b> Mon Sept 28, 2026, 9 a.m. ET, and closes Sun Oct 4, 11:59 p.m. ET. Miss it and there's no second chance this fall.</div>
 <p><b>Who can enter:</b> only students who <u>currently live</u> in Purdue University Residences (a dorm or Purdue apartment). Students living off campus can't enter; they can join a <b>waitlist starting January 2027</b>. Undergrads only.</p>
@@ -110,19 +158,11 @@ function popupHtml(p){
 PROPS.forEach(function(p){
  var m=p.univ?L.marker([p.lat,p.lon],{icon:L.divIcon({className:'',html:'<div class="umark" style="width:20px;height:20px;background:'+COLORS[p.tier]+'">P</div>',iconSize:[20,20],iconAnchor:[10,10],popupAnchor:[0,-10]}),zIndexOffset:500}).addTo(map)
   :L.circleMarker([p.lat,p.lon],{radius:10,color:'#fff',weight:2,fillColor:COLORS[p.tier],fillOpacity:.95}).addTo(map);
- m.bindPopup(popupHtml(p),{maxWidth:340,autoPanPadding:[20,20]});
+ m.bindPopup(function(){return favPopup(p)},{maxWidth:340,minWidth:250,autoPanPadding:[20,20]});
  m.bindTooltip(p.name.split(' (')[0].split(' –')[0],{direction:'top',offset:[0,-8]});
  markers[p.id]=m;
 });
-var sorted=PROPS.slice().sort(function(a,b){if(a.sort==null)return 1;if(b.sort==null)return -1;return a.sort-b.sort});
-var list=document.getElementById('list');
-sorted.forEach(function(p){
- var d=document.createElement('div');d.className='item';d.tabIndex=0;
- d.innerHTML='<div class="nm">'+(p.univ?'<span class="usq" style="background:'+COLORS[p.tier]+'"></span>':'<span class="dot" style="background:'+COLORS[p.tier]+'"></span>')+esc(p.name)+'</div>'+(p.univ?'<span class="ubadge">University-owned (Purdue Housing)</span>':'')+'<div class="pr">'+esc(p.price_short||p.price_pp)+'</div><div class="mt">'+esc(p.walk.split(' to ')[0])+' · '+esc(p.status_short)+'</div>';
- function go(){map.flyTo([p.lat,p.lon],17,{duration:.6});setTimeout(function(){markers[p.id].openPopup()},650);}
- d.onclick=go;d.onkeydown=function(e){if(e.key==='Enter')go()};
- list.appendChild(d);
-});
+function ITEMHTML(p){return '<div class="nm">'+(p.univ?'<span class="usq" style="background:'+COLORS[p.tier]+'"></span>':'<span class="dot" style="background:'+COLORS[p.tier]+'"></span>')+esc(p.name)+'</div>'+(p.univ?'<span class="ubadge">University-owned (Purdue Housing)</span>':'')+'<div class="pr">'+esc(p.price_short||p.price_pp)+'</div><div class="mt">'+esc(p.walk.split(' to ')[0])+' · '+esc(p.status_short)+'</div>';}
 var lg=L.control({position:'bottomright'});
 lg.onAdd=function(){var div=L.DomUtil.create('div','legend');div.innerHTML='<b>Price tier</b><br>'+['budget','mid','premium','unknown'].map(function(t){return '<span class="dot" style="background:'+COLORS[t]+'"></span>'+TIERNAME[t]}).join('<br>')+'<br><span class="usq" style="background:#fff"></span>Purdue Housing (square)'+'<br><b style="background:#000;color:#ffd200;padding:0 3px">PMU</b> Union';return div};
 lg.addTo(map);
@@ -130,4 +170,141 @@ var all=PROPS.map(function(p){return [p.lat,p.lon]});all.push(PMU);
 map.fitBounds(all,{padding:[30,30]});
 var m=location.hash.match(/open=(\w+)/);
 if(m&&markers[m[1]]){map.setView(markers[m[1]].getLatLng(),16);setTimeout(function(){markers[m[1]].openPopup()},400);}
+/* ---- Favorites, notes, and no-backend group sharing (included by build.py) ---- */
+var NOTE_MAX=500,NAME_MAX=30,LS='p4m.';
+var PBYID={};PROPS.forEach(function(p){PBYID[p.id]=p});
+function t(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function lsGet(k,d){try{var v=localStorage.getItem(LS+k);return v==null?d:JSON.parse(v)}catch(e){return d}}
+function lsSet(k,v){try{localStorage.setItem(LS+k,JSON.stringify(v))}catch(e){}}
+var DEV=lsGet('dev',null);if(!DEV){DEV=Math.random().toString(36).slice(2,8);lsSet('dev',DEV)}
+var ME=lsGet('me',{f:[],t:{}});if(!ME||!Array.isArray(ME.f))ME={f:[],t:{}};if(!ME.t)ME.t={};
+var FRIENDS=lsGet('friends',[]);if(!Array.isArray(FRIENDS))FRIENDS=[];
+var UI=lsGet('ui',{favOnly:false,sort:'price'});
+function myName(){return (lsGet('name','')||'').trim()}
+function isFav(id){return ME.f.indexOf(id)>=0}
+function saveMe(){lsSet('me',ME);scheduleLink()}
+function people(){ // you first, then friends
+ var a=[{me:true,n:myName()||'You',f:ME.f,t:ME.t}];
+ FRIENDS.forEach(function(fr){a.push({me:false,d:fr.d,n:fr.n,f:fr.f||[],t:fr.t||{}})});return a}
+function groupCount(id){return people().filter(function(x){return x.f.indexOf(id)>=0}).length}
+function sanitize(o){ // validate anything that came from a URL
+ if(!o||typeof o!=='object')return null;
+ var f=(Array.isArray(o.f)?o.f:[]).filter(function(id){return typeof id==='string'&&PBYID[id]}).slice(0,100);
+ var tt={};if(o.t&&typeof o.t==='object')Object.keys(o.t).forEach(function(id){if(PBYID[id]&&typeof o.t[id]==='string'&&o.t[id].trim())tt[id]=o.t[id].slice(0,NOTE_MAX)});
+ var n=(typeof o.n==='string'?o.n:'').trim().slice(0,NAME_MAX)||'A friend';
+ return {d:typeof o.d==='string'?o.d.slice(0,12):'',n:n,f:f,t:tt}}
+/* ---- encoding: JSON -> UTF-8 -> (deflate-raw if it helps and is supported) -> base64url ---- */
+function b64u(bytes){var s='';for(var i=0;i<bytes.length;i+=8192)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+8192));return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function unb64u(s){s=s.replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
+function streamBytes(bytes,T){return new Response(new Blob([bytes]).stream().pipeThrough(new T('deflate-raw'))).arrayBuffer().then(function(b){return new Uint8Array(b)})}
+function encodePicks(){
+ var o={v:1,d:DEV,n:myName(),f:ME.f.slice()},tt={},any=false;
+ Object.keys(ME.t).forEach(function(id){if(ME.t[id]&&ME.t[id].trim()){tt[id]=ME.t[id];any=true}});if(any)o.t=tt;
+ var raw=new TextEncoder().encode(JSON.stringify(o)),plain='1'+b64u(raw);
+ if(typeof CompressionStream==='undefined'||raw.length<180)return Promise.resolve(plain);
+ return streamBytes(raw,CompressionStream).then(function(z){var c='2'+b64u(z);return c.length<plain.length*0.85?c:plain}).catch(function(){return plain})}
+function decodePicks(s){
+ try{var kind=s.charAt(0),bytes=unb64u(s.slice(1))}catch(e){return Promise.reject(e)}
+ var p=kind==='2'?(typeof DecompressionStream==='undefined'?Promise.reject(new Error('old browser')):streamBytes(bytes,DecompressionStream)):Promise.resolve(bytes);
+ return p.then(function(b){return JSON.parse(new TextDecoder().decode(b))})}
+var LINK='',linkTimer=null,LINKDIRTY=true,linkSeq=0;
+function scheduleLink(){LINKDIRTY=true;var my=++linkSeq;clearTimeout(linkTimer);linkTimer=setTimeout(function(){encodePicks().then(function(c){if(my!==linkSeq)return;LINKDIRTY=false;LINK=location.href.split('#')[0]+'#picks='+c;var i=document.getElementById('sharelink');if(i&&document.getElementById('sharebox').style.display==='block')i.value=LINK})},150)}
+/* ---- banner ---- */
+var bT;function banner(msg){var b=document.getElementById('banner');b.textContent=msg;b.style.display='block';clearTimeout(bT);bT=setTimeout(function(){b.style.display='none'},4500)}
+/* ---- importing a friend's link ---- */
+function importFromHash(){
+ var m=location.hash.match(/[#&]picks=([A-Za-z0-9_-]+)/);if(!m)return;
+ var code=m[1];history.replaceState(null,'',location.pathname+location.search);
+ decodePicks(code).then(function(o){
+  var s=sanitize(o);if(!s)throw new Error('bad');
+  if(s.d&&s.d===DEV){banner('That’s your own share link. Your picks are already here.');return}
+  var i=-1;FRIENDS.forEach(function(fr,k){if((s.d&&fr.d===s.d)||(!s.d&&fr.n.toLowerCase()===s.n.toLowerCase()))i=k});
+  s.at=Date.now();if(i>=0)FRIENDS[i]=s;else FRIENDS.push(s);lsSet('friends',FRIENDS);
+  banner((i>=0?'Updated ':'Added ')+s.n+'’s picks ('+s.f.length+' ♥)');refreshAll()
+ }).catch(function(e){banner(e&&e.message==='old browser'?'This link needs a newer browser to open. Try updating it.':'Sorry, that picks link looks broken or incomplete.')})}
+/* ---- sidebar controls ---- */
+function setupBar(){
+ var nm=document.getElementById('myname');nm.maxLength=NAME_MAX;nm.value=myName();
+ nm.addEventListener('input',function(){lsSet('name',nm.value.slice(0,NAME_MAX));renderGroupList();scheduleLink()});
+ var fo=document.getElementById('favonly');fo.checked=!!UI.favOnly;fo.onchange=function(){UI.favOnly=fo.checked;lsSet('ui',UI);refreshAll()};
+ var so=document.getElementById('sortby');so.value=UI.sort==='group'?'group':'price';so.onchange=function(){UI.sort=so.value;lsSet('ui',UI);renderList()};
+ document.getElementById('sharebtn').onclick=sharePicks;
+ document.getElementById('copybtn').onclick=function(){copyLink(document.getElementById('sharelink').value)};
+ document.getElementById('sharelink').onfocus=function(){this.select()};
+}
+function sharePicks(){
+ if(!myName()){var nm=document.getElementById('myname');nm.focus();banner('Type your name first so your friends know whose picks these are.');return}
+ var box=document.getElementById('sharebox'),inp=document.getElementById('sharelink');
+ function go(link){
+  box.style.display='block';inp.value=link;
+  var phone=window.matchMedia&&matchMedia('(pointer:coarse)').matches;
+  if(phone&&navigator.share){navigator.share({title:myName()+'’s Purdue apartment picks',text:myName()+'’s apartment picks ('+ME.f.length+' ♥):',url:link}).then(function(){msg('Shared!')}).catch(function(e){if(!e||e.name!=='AbortError')copyLink(link)})}
+  else copyLink(link)}
+ if(LINK&&!LINKDIRTY)go(LINK);else encodePicks().then(function(c){LINK=location.href.split('#')[0]+'#picks='+c;go(LINK)})}
+function msg(s){var m=document.getElementById('sharemsg');m.textContent=s;clearTimeout(m._t);m._t=setTimeout(function(){m.textContent=''},5000)}
+function copyLink(link){
+ function fallback(){var i=document.getElementById('sharelink');i.value=link;i.focus();i.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}msg(ok?'✓ Link copied! Paste it in your group chat.':'Copy the link below and paste it in your group chat.')}
+ if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(link).then(function(){msg('✓ Link copied! Paste it in your group chat.')},fallback);else fallback()}
+function renderGroupList(){
+ var g=document.getElementById('grouplist'),h='<b>Group:</b> <span class="gp me">'+t(myName()||'You')+' (you) ♥'+ME.f.length+'</span>';
+ FRIENDS.forEach(function(fr,i){h+='<span class="gp">'+t(fr.n)+' ♥'+fr.f.length+'<button class="rm" data-i="'+i+'" title="Remove '+t(fr.n)+'’s picks" aria-label="Remove '+t(fr.n)+'’s picks">×</button></span>'});
+ if(!FRIENDS.length)h+=' <span style="color:#777">Friends’ picks show up here when you open their links.</span>';
+ g.innerHTML=h;
+ Array.prototype.forEach.call(g.querySelectorAll('.rm'),function(b){b.onclick=function(){var fr=FRIENDS[+b.getAttribute('data-i')];if(!fr||!confirm('Remove '+fr.n+'’s picks from this device?'))return;FRIENDS.splice(+b.getAttribute('data-i'),1);lsSet('friends',FRIENDS);refreshAll()}})}
+/* ---- sidebar list ---- */
+function heartChar(on){return on?'♥':'♡'}
+function renderList(){
+ var list=document.getElementById('list');list.innerHTML='';
+ var arr=PROPS.slice().sort(function(a,b){if(a.sort==null&&b.sort==null)return 0;if(a.sort==null)return 1;if(b.sort==null)return -1;return a.sort-b.sort});
+ if(UI.sort==='group'){var gc={};arr.forEach(function(p){gc[p.id]=groupCount(p.id)});arr=arr.map(function(p,i){return [p,i]}).sort(function(a,b){return (gc[b[0].id]-gc[a[0].id])||(a[1]-b[1])}).map(function(x){return x[0]})}
+ if(UI.favOnly)arr=arr.filter(function(p){return isFav(p.id)});
+ if(!arr.length){list.innerHTML='<div style="padding:14px 12px;color:#666">No favorites yet. Tap ♡ on a place to add it, or untick “Show favorites only”.</div>';return}
+ arr.forEach(function(p){
+  var d=document.createElement('div'),on=isFav(p.id),n=groupCount(p.id),note=(ME.t[p.id]||'').trim();
+  d.className='item'+(UI.sort==='group'&&n===0?' dim':'');d.tabIndex=0;d.setAttribute('data-id',p.id);
+  var fx='';if(n)fx+='<span class="gc" title="'+n+' in your group favorited this">♥ '+n+'</span>';if(note)fx+='<span title="You added a note">📝 note</span>';
+  d.innerHTML='<button class="hbtn" aria-pressed="'+on+'" aria-label="'+(on?'Remove from':'Add to')+' favorites" title="'+(on?'Remove from':'Add to')+' favorites">'+heartChar(on)+'</button><div class="ib">'+ITEMHTML(p)+(fx?'<div class="fx">'+fx+'</div>':'')+'</div>';
+  function go(){map.flyTo([p.lat,p.lon],17,{duration:.6});setTimeout(function(){markers[p.id].openPopup()},650)}
+  d.onclick=go;d.onkeydown=function(e){if(e.key==='Enter'&&e.target===d)go()};
+  var hb=d.querySelector('.hbtn');hb.onclick=function(e){e.stopPropagation();toggleFav(p.id)};
+  list.appendChild(d)})}
+function toggleFav(id){var i=ME.f.indexOf(id);if(i>=0)ME.f.splice(i,1);else ME.f.push(id);saveMe();refreshAll()}
+/* ---- map pins ---- */
+var badges={};
+function renderPins(){
+ PROPS.forEach(function(p){
+  var m=markers[p.id],on=isFav(p.id),n=groupCount(p.id),show=!UI.favOnly||on;
+  if(show&&!map.hasLayer(m))m.addTo(map);if(!show&&map.hasLayer(m)){m.closePopup();map.removeLayer(m)}
+  if(p.univ){var el=m.getElement&&m.getElement();if(el&&el.firstChild)el.firstChild.classList.toggle('favring',on)}
+  else m.setStyle(on?{color:'#ffc400',weight:4}:{color:'#fff',weight:2});
+  if(badges[p.id]){map.removeLayer(badges[p.id]);delete badges[p.id]}
+  if(show&&n){var txt=(on?'♥':'♡')+(n>1||!on?n:''),w=12+txt.length*7;
+   var b=L.marker([p.lat,p.lon],{icon:L.divIcon({className:'favbadge'+(on?'':' fr'),html:txt,iconSize:[w,16],iconAnchor:[-4,24]}),zIndexOffset:1500,keyboard:false,title:n+' in your group favorited this'}).addTo(map);
+   b.on('click',function(){markers[p.id].openPopup()});badges[p.id]=b}})}
+/* ---- popup favorites block ---- */
+function groupHtml(id){
+ var rows=people().map(function(x){var h=x.f.indexOf(id)>=0,nt=(x.t[id]||'').trim();
+  return '<div class="gr"><span style="color:#c2185b">'+(h?'♥':'♡')+'</span> <b style="display:inline">'+t(x.n)+(x.me?' (you)':'')+'</b>'+(h?'':' <span style="color:#888">(no heart)</span>')+(nt?'<div class="nt">'+t(nt)+'</div>':'')+'</div>'}).join('');
+ return '<b>Group ('+groupCount(id)+' ♥)</b>'+rows}
+function favPopup(p){
+ var wrap=document.createElement('div');wrap.innerHTML=popupHtml(p);
+ var blk=document.createElement('div');blk.className='favblk';
+ blk.innerHTML='<button class="hbig" type="button"></button><textarea maxlength="'+NOTE_MAX+'" placeholder="Your notes (saved on this device)…" aria-label="Your notes"></textarea><div class="cnt"></div><div class="grp"></div>';
+ var pr=wrap.querySelector('.price');if(pr)pr.parentNode.insertBefore(blk,pr.nextSibling);else wrap.firstChild.appendChild(blk);
+ var hb=blk.querySelector('.hbig'),ta=blk.querySelector('textarea'),cnt=blk.querySelector('.cnt'),grp=blk.querySelector('.grp');
+ function paint(){var on=isFav(p.id);hb.className='hbig'+(on?' on':'');hb.textContent=on?'♥ Favorited':'♡ Favorite';hb.setAttribute('aria-pressed',on);grp.innerHTML=groupHtml(p.id)}
+ ta.value=ME.t[p.id]||'';cnt.textContent=ta.value.length+' / '+NOTE_MAX;
+ var st;ta.addEventListener('input',function(){if(ta.value.length>NOTE_MAX)ta.value=ta.value.slice(0,NOTE_MAX);cnt.textContent=ta.value.length+' / '+NOTE_MAX;
+  var v=ta.value;if(v.trim())ME.t[p.id]=v;else delete ME.t[p.id];clearTimeout(st);st=setTimeout(function(){saveMe();renderList();paintGroupOnly()},300)});
+ function paintGroupOnly(){grp.innerHTML=groupHtml(p.id)}
+ hb.onclick=function(){toggleFav(p.id)};
+ blk._paint=paint;paint();L.DomEvent.disableClickPropagation(blk);L.DomEvent.disableScrollPropagation(blk);
+ return wrap}
+function refreshOpenPopups(){Array.prototype.forEach.call(document.querySelectorAll('.leaflet-popup .favblk'),function(b){b._paint&&b._paint()})}
+function refreshAll(){renderGroupList();renderList();renderPins();refreshOpenPopups()}
+/* ---- init ---- */
+setupBar();refreshAll();scheduleLink();importFromHash();
+window.addEventListener('hashchange',importFromHash);
+window.addEventListener('storage',function(e){if(e.key&&e.key.indexOf(LS)===0){ME=lsGet('me',ME);FRIENDS=lsGet('friends',FRIENDS);refreshAll()}});
+
 </script></body></html>
